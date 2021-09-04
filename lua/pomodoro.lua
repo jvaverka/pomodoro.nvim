@@ -1,6 +1,12 @@
+-- TODO: change notify icons to hour glasses
+-- TODO: change status message
+-- TODO: use notify to give feedback at each decision
+
 vim.g.pomodoro_time_work = 25
+vim.g.pomodoro_time_warn = 2
 vim.g.pomodoro_time_break_short = 5
 vim.g.pomodoro_time_break_long = 20
+vim.g.pomodoro_time_break_warn = 2
 vim.g.pomodoro_timers_to_long_break = 4
 
 local pomodoro_state = 'stopped'
@@ -30,7 +36,12 @@ local display_pomodoro_completed_menu
 local function start_pomodoro()
     if pomodoro_state ~= 'started' then
         local work_milliseconds = vim.g.pomodoro_time_work * 60 * 1000
+        local warn_milliseconds = vim.g.pomodoro_time_work - vim.g.pomodoro_time_warn * 60 * 1000
         pomodoro_uv_timer:start(work_milliseconds, 0, vim.schedule_wrap(display_pomodoro_completed_menu))
+        pomodoro_uv_timer:start(warn_milliseconds, 0, vim.schedule_wrap(notify_status))
+        require('notify')('Timer set for ' .. vim.g.pomodoro_time_work .. 'minutes.', 'info', {
+            title = 'Pomodoro Started'
+        })
         pomodoro_work_started_at = os.time()
         pomodoro_state = 'started'
     end
@@ -41,7 +52,12 @@ local function start_break()
     if pomodoro_state == 'started' then
         pomodoro_timers_completed = (pomodoro_timers_completed + 1) % vim.g.pomodoro_timers_to_long_break
         local break_milliseconds = pomodoro_time_break() * 60 * 1000
+        local warn_milliseconds = pomodoro_time_break() - vim.g.pomodoro_time_warn * 60 * 1000
         pomodoro_uv_timer:start(break_milliseconds, 0, vim.schedule_wrap(display_break_completed_menu))
+        pomodoro_uv_timer:start(warn_milliseconds, 0, vim.schedule_wrap(notify_status))
+        require('notify')('Timer set for ' .. vim.g.pomodoro_time_work .. 'minutes.', 'info', {
+            title = 'Break Started'
+        })
         pomodoro_break_started_at = os.time()
         pomodoro_state = 'break'
     end
@@ -68,7 +84,7 @@ function Pomodoro.statusline()
 end
 
 function Pomodoro.status()
-    print(Pomodoro.statusline())
+    require('notify')(Pomodoro.statusline(), 'info')
 end
 
 function Pomodoro.stop()
@@ -84,6 +100,10 @@ function Pomodoro.setup(tbl)
         vim.g.pomodoro_time_work = tbl.time_work
     end
 
+    if tbl.time_warn then
+        vim.g.pomodoro_time_warn = tbl.time_warn
+    end
+
     if tbl.time_break_short then
         vim.g.pomodoro_time_break_short = tbl.time_break_short
     end
@@ -92,13 +112,49 @@ function Pomodoro.setup(tbl)
         vim.g.pomodoro_time_break_long = tbl.time_break_long
     end
 
+    if tbl.time_break_warn  then
+        vim.g.pomodoro_time_break_warn = tbl.time_break_warn
+    end
+
     if tbl.timers_to_long_break then
         vim.g.pomodoro_timers_to_long_break = tbl.timers_to_long_break
     end
+
+    if tbl.notify_enable  then
+        vim.g.pomodoro_notify_enable = tbl.notify_enable
+    end
+
 end
 
 local Menu = require('nui.menu')
 local event = require('nui.utils.autocmd').event
+
+notify_status = function()
+    if pomodoro_state == 'stopped' then
+        local message
+        if pomodoro_timers_completed > 0 then
+            message = pomodoro_timers_completed .. ' already completed. Well Done!'
+        else
+            message = 'No pomodoros done. What are you waiting for?'
+        end
+        require('notify')(message, 'info', {
+            title =  'No Pomodoro',
+            timeout = 5000,
+        })
+    elseif pomodoro_state == 'started' then
+        local time_left = pomodoro_time_remaining(vim.g.pomodoro_time_work, pomodoro_work_started_at)
+        local message = time_left .. ' remaining. Keep working!'
+        require('notify')(message, 'warn', {
+            title = 'Pomodoro Active',
+            timeout = 5000,
+        })
+    else
+        require('notify')(vim.g.pomodoro_time_break_warn .. ' remaining. Relax.', 'info', {
+            title = 'Break Active',
+            timeout = 5000,
+        })
+    end
+end
 
 display_pomodoro_completed_menu = function()
     local popup_options = {
