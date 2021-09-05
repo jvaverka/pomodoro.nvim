@@ -5,6 +5,8 @@ A Neovim plugin written (mostly) in Lua that implements the
 
 ## Features
 
+TODO: Add new nvim-notify features + screenshots
+
 When a timer goes off, a menu is displayed to prompt you to take a break
 (or start the next pomodoro) with the option to stop the Pomodoro session.
 
@@ -41,6 +43,9 @@ order to take a longer break. The values shown below are the defaults.
 
 ### Lua
 
+TODO: Add notify color configuration details
+TODO: Add notify warning options
+
 ```lua
 use {
     'drwhatheheck/pomodoro.nvim',
@@ -67,6 +72,8 @@ let g:pomodoro_timers_to_long_break = 4
 
 ## Usage
 
+TODO: Add optional keymappings
+
 Three Ex commands are provided.
 
 | Command         | Description                                           |
@@ -89,6 +96,8 @@ require('lualine').setup({
 ```
 
 ## Alternatives
+
+TODO: Investigate integrating tasks
 
 - [mnick/vim-pomodoro](https://github.com/mnick/vim-pomodoro)
     and [adelarsq/vim-pomodoro](https://github.com/adelarsq/vim-pomodoro) are
