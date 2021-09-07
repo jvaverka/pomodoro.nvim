@@ -52,7 +52,7 @@ local function start_break()
         local warn_milliseconds = (pomodoro_time_break() - vim.g.pomodoro_time_warn) * 60 * 1000
         pomodoro_uv_timer:start(break_milliseconds, 0, vim.schedule_wrap(display_break_completed_menu))
         warning_uv_timer:start(warn_milliseconds, 0, vim.schedule_wrap(NotifyBreak))
-        vim.notify('Timer set for ' .. vim.g.pomodoro_time_warn .. ' minutes. Relax.', 'breakstart', {
+        vim.notify('Timer set for ' .. pomodoro_time_break() .. ' minutes. Relax.', 'breakstart', {
             title = 'Break Started'
         })
         pomodoro_break_started_at = os.time()
