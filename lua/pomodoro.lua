@@ -124,7 +124,7 @@ NotifyStop = function()
     if pomodoro_timers_completed > 0 then
         message = 'You have completed ' .. pomodoro_timers_completed .. ' Pomodoros. Well Done!'
     else
-        message = 'Zero pomodoros completed. What are you waiting for?'
+        message = 'Zero pomodoros completed in this session.'
     end
     vim.notify(message, 'pomoff', {
         title =  'Inactive',
