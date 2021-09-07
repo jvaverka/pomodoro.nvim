@@ -13,7 +13,7 @@ local pomodoro_uv_timer = nil
 local warning_uv_timer = nil
 
 local function pomodoro_time_break()
-    if pomodoro_timers_completed == 0 then
+    if pomodoro_timers_completed == 3 then
         return vim.g.pomodoro_time_break_long
     else
         return vim.g.pomodoro_time_break_short
@@ -52,7 +52,7 @@ local function start_break()
         local warn_milliseconds = (pomodoro_time_break() - vim.g.pomodoro_time_warn) * 60 * 1000
         pomodoro_uv_timer:start(break_milliseconds, 0, vim.schedule_wrap(display_break_completed_menu))
         warning_uv_timer:start(warn_milliseconds, 0, vim.schedule_wrap(NotifyBreak))
-        vim.notify('Timer set for ' .. vim.g.pomodoro_time_work .. ' minutes. Relax.', 'breakstart', {
+        vim.notify('Timer set for ' .. vim.g.pomodoro_time_warn .. ' minutes. Relax.', 'breakstart', {
             title = 'Break Started'
         })
         pomodoro_break_started_at = os.time()
