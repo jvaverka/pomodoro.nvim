@@ -1,3 +1,5 @@
+-- TODO: Add overall Pomodoro counter variable. Gets reset at 4 right now I think.
+
 vim.g.pomodoro_time_work = 25
 vim.g.pomodoro_time_warn = 3
 vim.g.pomodoro_time_break_short = 5
