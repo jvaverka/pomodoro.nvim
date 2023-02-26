@@ -13,6 +13,7 @@ local pomodoro_break_started_at = 0
 local pomodoro_timers_completed = 0
 local pomodoro_uv_timer = nil
 local warning_uv_timer = nil
+local pomodoro_sound = '~/Downloads/mario-sounds/smb_pause.wav'
 
 local function pomodoro_time_break()
     if pomodoro_timers_completed == 3 then
@@ -77,6 +78,8 @@ function Pomodoro.status()
     elseif pomodoro_state == 'started' then NotifyStart()
     else NotifyBreak()
     end
+
+    os.execute(string.format('aplay %s', pomodoro_sound))
 end
 
 function Pomodoro.stop()
